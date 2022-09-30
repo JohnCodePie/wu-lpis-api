@@ -50,8 +50,9 @@ class WuLpisApi():
 
         r = self.browser.open(self.URL)
         self.browser.select_form('login')
+        data = r.read()
 
-        tree = html.fromstring(re.sub(r"<!--(.|\s|\n)*?-->", "", r.read())) # removes comments from html 
+        tree = html.fromstring(re.sub(r'(?m)^ *#.*\n?', '', str(data))) # removes comments from html 
         input_username = list(set(tree.xpath("//input[@accesskey='u']/@name")))[0]
         input_password = list(set(tree.xpath("//input[@accesskey='p']/@name")))[0]
 
@@ -117,15 +118,16 @@ class WuLpisApi():
         
         form = self.browser.form
         # Select first element in Select Options Dropdown
-        item = form.find_control("ASPP").get(None ,None, None, 0)
-        item.selected = True
+        #item = form.find_control("").get(None ,None, None, 0)
+        #item.selected = True
 
         r = self.browser.submit()
-        soup = BeautifulSoup(r.read(), "html.parser")
-
+        data = r.read()
+        soup = BeautifulSoup(data, "html.parser")
+        
         studies = {}
         studies = {}
-        for i, entry in enumerate(soup.find('select', {'name': 'ASPP'}).find_all('option')):
+        for i, entry in enumerate(soup.find('select').find_all('option')):
             if len(entry.text.split('/')) == 1:
                 studies[i] = {}
                 studies[i]['id'] = entry['value']
